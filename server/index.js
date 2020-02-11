@@ -3,6 +3,15 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 4000;
 
+
+// import CORS
+const cors = require("cors");
+app.options("*", cors())
+app.use(cors());
+
+var dotenv = require("dotenv");
+dotenv.config()
+
 // BODY PARSER
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -11,11 +20,6 @@ app.use(bodyParser.json());
 // Importar el modelo Articulo y Ticket
 const Articulo = require("../models/Articulo");
 const Ticket = require("../models/Ticket");
-
-// import CORS
-const cors = require("cors");
-app.use(cors());
-
 
 // ------------------------------- CRUD -------------------------------------//
 
@@ -109,8 +113,6 @@ app.delete("/borrar/ticket/:id", (req, res) => {
     .catch(DeleteTicket => res.status(400).send(DeleteTicket));
 });
 
-
-
 // -------------------- GET by ID -------------------- punto 3
 app.get("/calculo/ticket/:id", (req, res) => {
   Ticket.findById(req.params.id)
@@ -122,8 +124,8 @@ app.get("/calculo/ticket/:id", (req, res) => {
       item.articulos.map(articulo => {
         subtotal = subtotal + articulo.precio;
       }),
-        itbms = itbms * subtotal,
-        total = total + subtotal + itbms,
+        (itbms = itbms * subtotal),
+        (total = total + subtotal + itbms),
         Ticket.findByIdAndUpdate(req.params.id, {
           subtotal: subtotal,
           itbms: itbms,
@@ -137,6 +139,5 @@ app.get("/calculo/ticket/:id", (req, res) => {
     })
     .catch(err => res.status(409).send({ msj: "Error en getById", res: err }));
 });
-
 
 module.exports = { app, port };
